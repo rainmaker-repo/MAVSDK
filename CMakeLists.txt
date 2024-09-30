@@ -17,7 +17,8 @@ if (NOT MAVLINK_DIALECT)
 endif()
 
 execute_process(
-    COMMAND git describe --abbrev=8 --dirty --always --tags
+    COMMAND ${CMAKE_COMMAND} -E env GIT_SSH_COMMAND="ssh -i /home/rainmaker/.ssh/id_github -o StrictHostKeyChecking=no" 
+    git describe --abbrev=8 --dirty --always --tags
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     OUTPUT_VARIABLE VERSION_STR
     OUTPUT_STRIP_TRAILING_WHITESPACE
