@@ -11,24 +11,28 @@ list(APPEND CMAKE_ARGS
 
 set(MAVLINK_GIT_HASH 9d87a209f43d1c096741b9da6a86ca41c44615a6)
 
+if(NOT DEFINED MAVLINK_GIT_REMOTE_URL)
+    set(MAVLINK_GIT_REMOTE_URL "git@github.com:mavlink/mavlink.git")
+endif()
+
 if(IOS)
     ExternalProject_add(
         mavlink
-        GIT_REPOSITORY https://github.com/rainmaker-repo/rm-mavlink
-        GIT_TAG ${MAVLINK_GIT_HASH}
-        PREFIX mavlink
-        PATCH_COMMAND git checkout .
-        COMMAND git apply ${PROJECT_SOURCE_DIR}/mavlink.patch
-        COMMAND git apply ${PROJECT_SOURCE_DIR}/mavlink_ios.patch
-        CMAKE_ARGS "${CMAKE_ARGS}"
-    )
-else()
-    ExternalProject_add(
-        mavlink
-        GIT_REPOSITORY https://github.com/rainmaker-repo/rm-mavlink
+        GIT_REPOSITORY ${MAVLINK_GIT_REMOTE_URL}
         GIT_TAG ${MAVLINK_GIT_HASH}
         PREFIX mavlink
         PATCH_COMMAND git checkout . && git apply ${PROJECT_SOURCE_DIR}/mavlink.patch
         CMAKE_ARGS "${CMAKE_ARGS}"
+        GIT_CONFIG core.sshCommand="ssh -i /home/rainmaker/.ssh/id_github -o StrictHostKeyChecking=no"
+    )
+else()
+    ExternalProject_add(
+        mavlink
+        GIT_REPOSITORY ${MAVLINK_GIT_REMOTE_URL}
+        GIT_TAG ${MAVLINK_GIT_HASH}
+        PREFIX mavlink
+        PATCH_COMMAND git checkout . && git apply ${PROJECT_SOURCE_DIR}/mavlink.patch
+        CMAKE_ARGS "${CMAKE_ARGS}"
+        GIT_CONFIG core.sshCommand="ssh -i /home/rainmaker/.ssh/id_github -o StrictHostKeyChecking=no"
     )
 endif()
