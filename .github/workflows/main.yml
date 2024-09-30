@@ -77,7 +77,27 @@ jobs:
     runs-on: ${{ matrix.ubuntu_image }}
     strategy:
       matrix:
-        ubuntu_image: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04]
+        include:
+          - ubuntu_image: ubuntu-20.04
+            cc: gcc
+            cxx: g++
+            description: Ubuntu 20.04 (GCC)
+          - ubuntu_image: ubuntu-22.04
+            cc: gcc
+            cxx: g++
+            description: Ubuntu 22.04 (GCC)
+          - ubuntu_image: ubuntu-24.04
+            cc: gcc-13
+            cxx: g++-13
+            description: Ubuntu 24.04 (GCC 13)
+          - ubuntu_image: ubuntu-24.04
+            cc: gcc-14
+            cxx: g++-14
+            description: Ubuntu 24.04 (GCC 14)
+          - ubuntu_image: ubuntu-24.04
+            cc: clang-18
+            cxx: clang++-18
+            description: Ubuntu 24.04 (clang 18)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -86,25 +106,33 @@ jobs:
         id: cache
         with:
           path: ./build/release/third_party/install
-          key: ${{ github.job }}-${{ matrix.ubuntu_image }}-${{ hashFiles('./third_party/**') }}
+          key: ${{ github.job }}-${{ matrix.ubuntu_image }}-${{ matrix.cc }}-${{ hashFiles('./third_party/**') }}-1
       - name: disable superbuild on cache hit
         if: steps.cache.outputs.cache-hit == 'true'
         run: echo "superbuild=-DSUPERBUILD=OFF" >> $GITHUB_ENV && echo "cmake_prefix_path=-DCMAKE_PREFIX_PATH=$(pwd)/build/release/third_party/install" >> $GITHUB_ENV
       - name: configure
-        run: cmake $superbuild $cmake_prefix_path -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_MAVSDK_SERVER=ON -DWERROR=ON -DENABLE_CPPTRACE=On -DCMAKE_INSTALL_PREFIX=install -Bbuild/release -H.
+        run: |
+          echo "CC=${{ matrix.cc }}" >> $GITHUB_ENV
+          echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
+          cmake $superbuild $cmake_prefix_path -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_MAVSDK_SERVER=ON -DWERROR=ON -DENABLE_CPPTRACE=On -DCMAKE_INSTALL_PREFIX=install -Bbuild/release -H.
       - name: cleanup to save space
         run: |
           rm -rf ./build/release/third_party/absl
           rm -rf ./build/release/third_party/cares
+          rm -rf ./build/release/third_party/cpptrace
           rm -rf ./build/release/third_party/curl
           rm -rf ./build/release/third_party/grpc
+          rm -rf ./build/release/third_party/gtest
           rm -rf ./build/release/third_party/jsoncpp
+          rm -rf ./build/release/third_party/libevents
+          rm -rf ./build/release/third_party/liblzma
           rm -rf ./build/release/third_party/mavlink
           rm -rf ./build/release/third_party/openssl
           rm -rf ./build/release/third_party/protobuf
           rm -rf ./build/release/third_party/re2
           rm -rf ./build/release/third_party/tinyxml2
           rm -rf ./build/release/third_party/zlib
+          rm -rf ./build/release/third_party/zlib-ng
       - name: build
         run: cmake --build build/release -j2
       - name: install
@@ -115,7 +143,7 @@ jobs:
          echo 'APT::Get::Always-Include-Phased-Updates "true";' | sudo tee -a /etc/apt/apt.conf.d/99-phased-updates
          sudo apt-get update
       - name: install examples dependencies
-        run: sudo apt-get install libsdl2-dev
+        run: sudo apt-get install libsdl2-dev ${{ matrix.cc }} ${{ matrix.cxx }}
       - name: configure examples
         run: cmake -DCMAKE_PREFIX_PATH="$(pwd)/install;$(pwd)/build/release/third_party/install" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWERROR=ON -Bexamples/build -Hexamples
       - name: build examples
@@ -152,7 +180,7 @@ jobs:
       #- name: system tests
       #  run: ./build/src/system_tests/system_tests_runner
 
-  ubuntu22-style-and-proto-check:
+  ubuntu24-style-and-proto-check:
     name: ubuntu-24.04 (style and proto check)
     runs-on: ubuntu-24.04
     steps:
@@ -183,7 +211,7 @@ jobs:
     runs-on: ${{ matrix.container_name }}
     strategy:
       matrix:
-        container_name: [ubuntu-20.04, ubuntu-22.04]
+        container_name: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -433,7 +461,7 @@ jobs:
             architecture: 'arm64'
     steps:
       - name: Install Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - uses: actions/checkout@v4
@@ -504,7 +532,7 @@ jobs:
             runner: macos-14
     steps:
       - name: Install Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           architecture: 'x64'

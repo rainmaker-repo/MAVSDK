@@ -11,6 +11,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cstring>
+#include <string>
 #include <thread>
 
 using namespace mavsdk;
@@ -25,7 +26,7 @@ void usage(const std::string& bin_name)
               << " For TCP : tcp://[server_host][:server_port]\n"
               << " For UDP : udp://[bind_host][:bind_port]\n"
               << " For Serial : serial:///path/to/serial/dev[:baudrate]\n"
-              << "For example, to connect to the simulator use URL: udp://:14540\n"
+              << "For example, to connect to the simulator use URL: udpin://0.0.0.0:14540\n"
               << '\n'
               << "To remove log files after all downloads completed,\n"
               << "please add the --rm argument" << std::endl;
@@ -42,7 +43,7 @@ int main(int argc, char** argv)
     bool remove_log_files = false;
 
     for (int i = 2; i < argc; ++i) {
-        if (argv[i] == "--rm") {
+        if (std::string(argv[i]) == "--rm") {
             remove_log_files = true;
         }
     }
