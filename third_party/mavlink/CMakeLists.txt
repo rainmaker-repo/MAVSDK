@@ -25,6 +25,10 @@ if(IOS)
         PATCH_COMMAND git checkout . && git apply ${PROJECT_SOURCE_DIR}/mavlink.patch
         CMAKE_ARGS "${CMAKE_ARGS}"
         GIT_CONFIG "core.sshCommand=${GIT_SSH_COMMAND}"
+        UPDATE_COMMAND ""
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND ""
     )
 else()
     ExternalProject_add(
@@ -35,5 +39,9 @@ else()
         PATCH_COMMAND git checkout . && git apply ${PROJECT_SOURCE_DIR}/mavlink.patch
         CMAKE_ARGS "${CMAKE_ARGS}"
         GIT_CONFIG "core.sshCommand=${GIT_SSH_COMMAND}"
+        UPDATE_COMMAND ""
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND ""
     )
 endif()
