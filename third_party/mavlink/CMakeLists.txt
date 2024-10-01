@@ -24,11 +24,12 @@ if(IOS)
         PREFIX mavlink
         PATCH_COMMAND git checkout . && git apply ${PROJECT_SOURCE_DIR}/mavlink.patch
         CMAKE_ARGS "${CMAKE_ARGS}"
-        GIT_CONFIG "core.sshCommand=${GIT_SSH_COMMAND}"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        INSTALL_COMMAND ""
+        CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} <SOURCE_DIR>
+        BUILD_COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR>
+        INSTALL_COMMAND ${CMAKE_COMMAND} --install <BINARY_DIR>
+        GIT_CONFIG "core.sshCommand=${GIT_SSH_COMMAND}"
+        DOWNLOAD_COMMAND ${CMAKE_COMMAND} -E env GIT_SSH_COMMAND=${GIT_SSH_COMMAND} git clone ${MAVLINK_GIT_REMOTE_URL} <SOURCE_DIR>
     )
 else()
     ExternalProject_add(
@@ -38,10 +39,11 @@ else()
         PREFIX mavlink
         PATCH_COMMAND git checkout . && git apply ${PROJECT_SOURCE_DIR}/mavlink.patch
         CMAKE_ARGS "${CMAKE_ARGS}"
-        GIT_CONFIG "core.sshCommand=${GIT_SSH_COMMAND}"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        INSTALL_COMMAND ""
+        CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} <SOURCE_DIR>
+        BUILD_COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR>
+        INSTALL_COMMAND ${CMAKE_COMMAND} --install <BINARY_DIR>
+        GIT_CONFIG "core.sshCommand=${GIT_SSH_COMMAND}"
+        DOWNLOAD_COMMAND ${CMAKE_COMMAND} -E env GIT_SSH_COMMAND=${GIT_SSH_COMMAND} git clone ${MAVLINK_GIT_REMOTE_URL} <SOURCE_DIR>
     )
 endif()
