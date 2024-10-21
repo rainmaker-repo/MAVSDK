@@ -3,7 +3,7 @@ project(external-mavlink)
 include(ExternalProject)
 
 # Set the specific Git commit hash
-set(MAVLINK_GIT_HASH b4add5292992cc43bd471b431b425338787982be)
+set(MAVLINK_GIT_HASH f1d42e2774cae767a1c0651b0f95e3286c587257)
 
 # Set the path to the SSH key placed by Ansible
 set(SSH_KEY_PATH "/home/rainmaker/.ssh/id_github")
